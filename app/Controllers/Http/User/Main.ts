@@ -3,7 +3,6 @@ import { User }  from 'App/Models'
 import { StoreValidator } from 'App/Validators/Auth'
 
 export default class UserController {
-  public async index({}: HttpContextContract) {}
 
   public async store({request, response}: HttpContextContract) {
     const data = request.only([
@@ -33,14 +32,35 @@ export default class UserController {
     return user
   }
 
-  public async update({}: HttpContextContract) {}
+  public async update({ request, auth, response}: HttpContextContract) {
+    const user = await User.findBy('id', auth.user!.id)
 
-  public async destroy({auth,response}: HttpContextContract) {
+    const data = request.only([
+      'name',
+      'email',
+      'password',
+    ])
+
+    if(user == null){
+      return response.status(500).send('Usuário não encontrado')
+    }
+
+    user.merge(data)
+    await user.save()
+    
+    return user
+  }
+
+  public async destroy({auth, response, request}: HttpContextContract) {
     const user = await User.findBy('id', auth.user!.id)
 
     if(user == null){
       return response.status(500).send('Usuário não encontrado')
     }
+
+    // else if(auth.user!.password != request.input('password')){
+    //   return response.status(401).send('Não autorizado')
+    // } 
 
     await user.delete()
     return user
