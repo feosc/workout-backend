@@ -9,6 +9,7 @@ export default class extends BaseSchema {
       table.integer('owner_fk').unsigned().references('id').inTable('users')
       table.integer('amount_exercises')
       table.integer('amount_reps')
+      table.integer('amount_series')
       table.integer('amount_weigth')
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
